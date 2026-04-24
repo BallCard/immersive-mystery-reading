@@ -15,6 +15,7 @@ export interface Suspect {
   imageUrl?: string;
   status: 'innocent' | 'suspicious' | 'guilty' | 'unknown';
   relatedCases?: { id: string; description: string }[];
+  alibi?: string;
 }
 
 export interface Choice {
@@ -54,6 +55,23 @@ export interface CaseRecord {
   completionDate: string;
   summary: string;
   evidenceCount: number;
+}
+
+export interface TimelineEvent {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  type: 'story' | 'evidence' | 'investigation';
+  sceneId: string;
+  icon?: string;
+}
+
+export interface CharacterRelation {
+  from: string;
+  to: string;
+  label: string;
+  type: 'love' | 'family' | 'friend' | 'colleague' | 'enemy' | 'case';
 }
 
 export interface GameState {

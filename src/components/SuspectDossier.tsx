@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Suspect } from '../types';
-import { User, AlertCircle, CheckCircle2, ShieldQuestion, Save, PenLine, ChevronDown, ChevronUp, Link as LinkIcon } from 'lucide-react';
+import { User, AlertCircle, CheckCircle2, ShieldQuestion, Save, PenLine, ChevronDown, ChevronUp, Link as LinkIcon, Eye, UserCheck } from 'lucide-react';
 
 interface SuspectDossierProps {
   suspects: Suspect[];
   notes: Record<string, string>;
   onUpdateNote: (id: string, note: string) => void;
+  onUpdateStatus: (id: string, status: Suspect['status']) => void;
 }
 
 const StatusIcon = ({ status }: { status: string }) => {
@@ -18,22 +19,33 @@ const StatusIcon = ({ status }: { status: string }) => {
   }
 };
 
+const STATUS_OPTIONS: { value: Suspect['status']; label: string }[] = [
+  { value: 'unknown', label: 'Unknown' },
+  { value: 'suspicious', label: 'Suspicious' },
+  { value: 'guilty', label: 'Guilty' },
+  { value: 'innocent', label: 'Innocent' },
+];
+
 interface SuspectCardProps {
   key?: React.Key;
   suspect: Suspect;
   initialNote: string | undefined;
   onSaveNote: (id: string, note: string) => void;
+  onUpdateStatus: (id: string, status: Suspect['status']) => void;
   idx: number;
 }
 
-const SuspectCard = ({ 
-  suspect, 
-  initialNote, 
+const SuspectCard = ({
+  suspect,
+  initialNote,
   onSaveNote,
-  idx 
+  onUpdateStatus,
+  idx
 }: SuspectCardProps) => {
   const [note, setNote] = useState(initialNote || '');
   const [isCasesExpanded, setIsCasesExpanded] = useState(false);
+  const [showAlibi, setShowAlibi] = useState(false);
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
 
   return (
     <motion.div
@@ -75,7 +87,7 @@ const SuspectCard = ({
 
         {/* Related Cases Section */}
         <div className="mb-4 border-b border-white/5 pb-2">
-          <button 
+          <button
             onClick={() => setIsCasesExpanded(!isCasesExpanded)}
             className="w-full flex items-center justify-between py-2 text-left group/btn"
           >
@@ -115,27 +127,93 @@ const SuspectCard = ({
             <span className="mono-label text-[8px] flex items-center gap-1 opacity-50">
               <PenLine className="w-2 h-2" /> Detective Notes
             </span>
-            <button 
+            <button
               onClick={() => onSaveNote(suspect.id, note)}
               className="text-[8px] font-mono flex items-center gap-1 text-noir-400 hover:text-white transition-colors"
             >
               <Save className="w-2 h-2" /> Save Note
             </button>
           </div>
-          <textarea 
+          <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder=" 기록할 내용을 입력하세요 (Type your observations here...)"
+            placeholder="输入你的观察记录..."
             className="flex-1 bg-transparent border-none resize-none text-[11px] text-noir-200 placeholder:text-noir-600 focus:ring-0 font-serif leading-relaxed min-h-[60px]"
           />
         </div>
 
+        {/* Alibi Panel */}
+        <AnimatePresence>
+          {showAlibi && suspect.alibi && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-4"
+            >
+              <div className="bg-detective-red/5 border border-detective-red/20 rounded p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Eye className="w-3 h-3 text-detective-red" />
+                  <span className="mono-label text-[9px] text-detective-red uppercase">Alibi / 不在场证明</span>
+                </div>
+                <p className="text-[11px] text-noir-200 leading-relaxed font-serif italic pl-5 border-l border-detective-red/20">
+                  {suspect.alibi}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Status Menu */}
+        <AnimatePresence>
+          {showStatusMenu && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-4"
+            >
+              <div className="bg-white/[0.03] border border-white/10 rounded p-2 flex gap-2 flex-wrap">
+                {STATUS_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      onUpdateStatus(suspect.id, opt.value);
+                      setShowStatusMenu(false);
+                    }}
+                    className={`text-[9px] font-mono px-3 py-1.5 rounded uppercase tracking-tighter transition-all ${
+                      suspect.status === opt.value
+                        ? 'bg-detective-red/20 text-detective-red border border-detective-red/30'
+                        : 'bg-white/5 hover:bg-white/10 text-noir-300 border border-transparent'
+                    }`}
+                  >
+                    <span className="mr-1.5"><StatusIcon status={opt.value} /></span>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="pt-4 border-t border-white/5 flex gap-2">
-          <button className="text-[9px] font-mono px-3 py-1 bg-white/5 hover:bg-white/10 transition-colors rounded uppercase tracking-tighter">
-            View Alibi
+          <button
+            onClick={() => { setShowAlibi(!showAlibi); setShowStatusMenu(false); }}
+            className={`text-[9px] font-mono px-3 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded uppercase tracking-tighter flex items-center gap-1.5 ${
+              showAlibi ? 'text-detective-gold' : ''
+            }`}
+          >
+            <Eye className="w-3 h-3" />
+            {showAlibi ? 'Hide Alibi' : 'View Alibi'}
           </button>
-          <button className="text-[9px] font-mono px-3 py-1 bg-white/5 hover:bg-white/10 transition-colors rounded uppercase tracking-tighter text-detective-red">
-            Mark as Suspect
+          <button
+            onClick={() => { setShowStatusMenu(!showStatusMenu); setShowAlibi(false); }}
+            className={`text-[9px] font-mono px-3 py-1.5 bg-white/5 hover:bg-white/10 transition-colors rounded uppercase tracking-tighter text-detective-red flex items-center gap-1.5 ${
+              showStatusMenu ? 'ring-1 ring-detective-red/30' : ''
+            }`}
+          >
+            <UserCheck className="w-3 h-3" />
+            Mark as...
           </button>
         </div>
       </div>
@@ -143,16 +221,17 @@ const SuspectCard = ({
   );
 };
 
-export const SuspectDossier: React.FC<SuspectDossierProps> = ({ suspects, notes, onUpdateNote }) => {
+export const SuspectDossier: React.FC<SuspectDossierProps> = ({ suspects, notes, onUpdateNote, onUpdateStatus }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
       {suspects.map((suspect, idx) => (
-        <SuspectCard 
-          key={suspect.id} 
-          suspect={suspect} 
-          initialNote={notes[suspect.id]} 
+        <SuspectCard
+          key={suspect.id}
+          suspect={suspect}
+          initialNote={notes[suspect.id]}
           onSaveNote={onUpdateNote}
-          idx={idx} 
+          onUpdateStatus={onUpdateStatus}
+          idx={idx}
         />
       ))}
     </div>

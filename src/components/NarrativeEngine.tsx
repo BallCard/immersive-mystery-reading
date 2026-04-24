@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Scene, Choice, Hotspot } from '../types';
-import { ChevronRight, Search, Eye } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 
 interface NarrativeEngineProps {
   scene: Scene;
@@ -10,92 +10,129 @@ interface NarrativeEngineProps {
   onTypingChange?: (isTyping: boolean) => void;
 }
 
-export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({ 
-  scene, 
-  onChoice, 
+export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({
+  scene,
+  onChoice,
   onHotspotClick,
-  onTypingChange 
+  onTypingChange
 }) => {
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const [isHoveringImage, setIsHoveringImage] = useState(false);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const sceneIdRef = useRef<string>('');
+
+  const skipTyping = useCallback(() => {
+    if (!isTyping) return;
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setDisplayText(scene.text);
+    setIsTyping(false);
+    onTypingChange?.(false);
+  }, [isTyping, scene.text, onTypingChange]);
 
   useEffect(() => {
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const currentSceneId = scene.id;
+    sceneIdRef.current = currentSceneId;
+
+    // Reset state
     setDisplayText('');
     setIsTyping(true);
+    onTypingChange?.(true);
+
+    const text = scene.text;
     let index = 0;
-    const interval = setInterval(() => {
-      if (index < scene.text.length) {
-        setDisplayText((prev) => prev + scene.text[index]);
+
+    intervalRef.current = setInterval(() => {
+      // Guard: if scene changed, stop
+      if (sceneIdRef.current !== currentSceneId) {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        return;
+      }
+
+      if (index < text.length) {
         index++;
+        setDisplayText(text.substring(0, index));
       } else {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        intervalRef.current = null;
         setIsTyping(false);
         onTypingChange?.(false);
-        clearInterval(interval);
       }
     }, 25);
 
-    onTypingChange?.(true);
-    return () => clearInterval(interval);
-  }, [scene]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [scene.id]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!imageRef.current) return;
-    const rect = imageRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x, y });
-  };
+  // Keyboard navigation: 1-9 to select choice, Space/Enter to skip typing
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isTyping) {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          skipTyping();
+        }
+        return;
+      }
+      const num = parseInt(e.key);
+      if (num >= 1 && num <= scene.choices.length) {
+        e.preventDefault();
+        onChoice(scene.choices[num - 1]);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isTyping, scene.choices, onChoice, skipTyping]);
+
+  // Update display when scene text is fully typed (for scene changes)
+  useEffect(() => {
+    if (!isTyping) {
+      setDisplayText(scene.text);
+    }
+  }, [scene.text, isTyping]);
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
         key={scene.id}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
         className="flex flex-col h-full max-w-5xl mx-auto p-4 md:p-8 space-y-6"
       >
         {/* Immersive Scene Area */}
         <div className="relative group flex-1 min-h-[400px] flex flex-col">
           <div
-            className="relative flex-1 rounded-sm overflow-hidden border border-white/5 bg-noir-900 shadow-[0_0_50px_rgba(0,0,0,0.5)] cursor-crosshair h-full"
-            ref={imageRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHoveringImage(true)}
-            onMouseLeave={() => setIsHoveringImage(false)}
+            className="relative flex-1 rounded-sm overflow-hidden border border-white/5 bg-noir-900 shadow-[0_0_50px_rgba(0,0,0,0.5)] h-full"
           >
             {scene.imageUrl ? (
               <>
                 <img
                   src={scene.imageUrl}
                   alt={scene.title}
-                  className="w-full h-full object-cover grayscale brightness-50 transition-all duration-700 group-hover:brightness-75"
+                  className="w-full h-full object-cover transition-all duration-700"
                   referrerPolicy="no-referrer"
-                  style={{
-                    maskImage: isHoveringImage 
-                      ? `radial-gradient(circle 120px at ${mousePos.x}% ${mousePos.y}%, black 0%, transparent 100%)`
-                      : 'none',
-                    WebkitMaskImage: isHoveringImage 
-                      ? `radial-gradient(circle 120px at ${mousePos.x}% ${mousePos.y}%, black 0%, transparent 100%)`
-                      : 'none',
-                  }}
                 />
-                
-                {/* Hotspots */}
-                {isHoveringImage && scene.hotspots?.map((spot) => (
-                  <motion.button
+
+                {/* Hotspots - always visible when they exist */}
+                {scene.hotspots?.map((spot) => (
+                  <button
                     key={spot.id}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ 
-                      scale: 1, 
-                      opacity: Math.max(0, 1 - (Math.sqrt(Math.pow(mousePos.x - spot.x, 2) + Math.pow(mousePos.y - spot.y, 2)) / 15))
-                    }}
                     onClick={() => onHotspotClick(spot)}
-                    className="absolute z-20 flex items-center justify-center"
+                    className="absolute z-20 flex items-center justify-center hover:scale-125 transition-transform"
                     style={{ left: `${spot.x}%`, top: `${spot.y}%`, width: `${spot.radius}px`, height: `${spot.radius}px`, transform: 'translate(-50%, -50%)' }}
                   >
                     <div className="w-2 h-2 bg-detective-red rounded-full animate-ping" />
@@ -103,7 +140,7 @@ export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({
                     <span className="absolute top-full mt-2 bg-noir-950 text-[10px] px-2 py-0.5 rounded border border-white/10 whitespace-nowrap shadow-xl">
                       {spot.label}
                     </span>
-                  </motion.button>
+                  </button>
                 ))}
               </>
             ) : (
@@ -113,10 +150,13 @@ export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({
             )}
 
             {/* Narrative Overlay on image */}
-            <div className="absolute bottom-0 left-0 right-0 p-10 bg-gradient-to-t from-noir-950 via-noir-950/90 to-transparent">
+            <div
+              className="absolute bottom-0 left-0 right-0 p-8 md:p-10 bg-gradient-to-t from-noir-950 via-noir-950/90 to-transparent cursor-pointer"
+              onClick={skipTyping}
+            >
               <div className="status-chip mb-4">场景：{scene.title}</div>
               <div className="min-h-[80px]">
-                <p className="narrative-text">
+                <p className="narrative-text whitespace-pre-wrap">
                   {displayText}
                   {isTyping && <span className="inline-block w-2 h-6 bg-detective-red ml-1 animate-pulse" />}
                 </p>
@@ -125,7 +165,7 @@ export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({
           </div>
         </div>
 
-        {/* Choices Area - Now more integrated */}
+        {/* Choices Area */}
         <div className="min-h-[140px]">
           {!isTyping && (
             <motion.div
@@ -133,7 +173,7 @@ export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8"
             >
-              {scene.choices.map((choice, idx) => (
+              {scene.choices.map((choice) => (
                 <button
                   key={choice.id}
                   onClick={() => onChoice(choice)}
@@ -144,13 +184,20 @@ export const NarrativeEngine: React.FC<NarrativeEngineProps> = ({
                   {choice.text}
                 </button>
               ))}
-              
+
               {scene.hotspots && scene.hotspots.length > 0 && (
                 <div className="md:col-span-2 text-center py-2 flex items-center justify-center gap-2 opacity-50">
                   <Eye className="w-3 h-3" />
-                  <span className="mono-label text-[8px]">移动光标在搜寻点位获取更多线索</span>
+                  <span className="mono-label text-[8px]">点击红色标记获取更多线索</span>
                 </div>
               )}
+
+              {/* Keyboard hint */}
+              <div className="md:col-span-2 text-center opacity-30">
+                <span className="mono-label text-[8px]">
+                  {isTyping ? '空格/回车跳过 · ' : ''}数字键选择选项
+                </span>
+              </div>
             </motion.div>
           )}
         </div>
