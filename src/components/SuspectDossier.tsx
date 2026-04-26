@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Suspect } from '../types';
-import { User, AlertCircle, CheckCircle2, ShieldQuestion, Save, PenLine, ChevronDown, ChevronUp, Link as LinkIcon, Eye, UserCheck } from 'lucide-react';
+import { User, AlertCircle, CheckCircle2, ShieldQuestion, Save, PenLine, ChevronDown, ChevronUp, Link as LinkIcon, Eye, UserCheck, Lock } from 'lucide-react';
 
 interface SuspectDossierProps {
   suspects: Suspect[];
   notes: Record<string, string>;
   onUpdateNote: (id: string, note: string) => void;
   onUpdateStatus: (id: string, status: Suspect['status']) => void;
+  visitedSceneIds: string[];
+  currentSceneId: string;
 }
+
+/**
+ * 检查嫌疑人档案是否已解锁
+ */
+const isSuspectUnlocked = (suspect: Suspect, visitedSceneIds: string[]): boolean => {
+  const unlockIdx = visitedSceneIds.indexOf(suspect.unlockedAtSceneId);
+  return unlockIdx !== -1;
+};
 
 const StatusIcon = ({ status }: { status: string }) => {
   switch (status) {
@@ -221,19 +231,32 @@ const SuspectCard = ({
   );
 };
 
-export const SuspectDossier: React.FC<SuspectDossierProps> = ({ suspects, notes, onUpdateNote, onUpdateStatus }) => {
+export const SuspectDossier: React.FC<SuspectDossierProps> = ({ suspects, notes, onUpdateNote, onUpdateStatus, visitedSceneIds, currentSceneId }) => {
+  // 只显示已解锁的嫌疑人
+  const unlockedSuspects = useMemo(() => 
+    suspects.filter(suspect => isSuspectUnlocked(suspect, visitedSceneIds)),
+    [suspects, visitedSceneIds]
+  );
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-      {suspects.map((suspect, idx) => (
-        <SuspectCard
-          key={suspect.id}
-          suspect={suspect}
-          initialNote={notes[suspect.id]}
-          onSaveNote={onUpdateNote}
-          onUpdateStatus={onUpdateStatus}
-          idx={idx}
-        />
-      ))}
+      {unlockedSuspects.length === 0 ? (
+        <div className="col-span-full py-24 flex flex-col items-center justify-center opacity-30 text-center">
+          <Lock className="w-16 h-16 mb-6" />
+          <p className="mono-label text-sm tracking-[0.3em]">档案尚未解锁</p>
+        </div>
+      ) : (
+        unlockedSuspects.map((suspect, idx) => (
+          <SuspectCard
+            key={suspect.id}
+            suspect={suspect}
+            initialNote={notes[suspect.id]}
+            onSaveNote={onUpdateNote}
+            onUpdateStatus={onUpdateStatus}
+            idx={idx}
+          />
+        ))
+      )}
     </div>
   );
 };

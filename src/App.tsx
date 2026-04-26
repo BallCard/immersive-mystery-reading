@@ -393,7 +393,7 @@ export default function App() {
                   <h2 className="text-4xl font-bold tracking-tighter mb-2 italic">证据收集</h2>
                   <p className="mono-label opacity-40">已发现的线索与物证 ({discoveredEvidence.length})</p>
                 </div>
-                <EvidenceBoard evidence={discoveredEvidence} />
+                <EvidenceBoard evidence={discoveredEvidence} visitedSceneIds={visitedSceneIds} currentSceneId={gameState.currentSceneId} />
               </motion.div>
             )}
 
@@ -414,6 +414,8 @@ export default function App() {
                   notes={gameState.suspectNotes}
                   onUpdateNote={updateSuspectNote}
                   onUpdateStatus={updateSuspectStatus}
+                  visitedSceneIds={visitedSceneIds}
+                  currentSceneId={gameState.currentSceneId}
                 />
               </motion.div>
             )}
@@ -454,6 +456,8 @@ export default function App() {
                 <RelationshipMap
                   suspects={suspectsWithStatus}
                   relations={CHARACTER_RELATIONS}
+                  visitedSceneIds={visitedSceneIds}
+                  currentSceneId={gameState.currentSceneId}
                 />
               </motion.div>
             )}

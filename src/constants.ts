@@ -477,7 +477,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '石神每天都会绕远路去弁天亭买便当，只为了看花冈靖子一眼。这种坚持已经持续了很久。',
     dateFound: '2026-04-22',
     type: 'testimony',
-    imageUrl: '/images/05_石神买便当.png'
+    imageUrl: '/images/05_石神买便当.png',
+    unlockedAtSceneId: 'bentou_shop'
   },
   {
     id: 'yasuko_daily_life',
@@ -485,7 +486,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '花冈靖子在弁天亭工作，和女儿美里相依为命。她的前夫富㭴慎二一直在纠缠她。',
     dateFound: '2026-04-22',
     type: 'testimony',
-    imageUrl: '/images/04_花冈靖子_便当店女主人.png'
+    imageUrl: '/images/04_花冈靖子_便当店女主人.png',
+    unlockedAtSceneId: 'bentou_shop'
   },
   {
     id: 'homeless_info',
@@ -493,7 +495,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '堤防边住着一群游民，石神给他们取了绰号："罐男"、"技师"等。他们是被社会遗忘的人。',
     dateFound: '2026-04-22',
     type: 'testimony',
-    imageUrl: '/images/02_新大桥下的游民聚落.png'
+    imageUrl: '/images/02_新大桥下的游民聚落.png',
+    unlockedAtSceneId: 'river_thinking'
   },
   {
     id: 'crime_scene_clue',
@@ -501,7 +504,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '石神注意到：靖子家有烟味但没有客人的鞋，暖桌位置被移动，空气中有不自然的紧张感。',
     dateFound: '2026-04-22',
     type: 'testimony',
-    imageUrl: '/images/58_推理细节_烟灰与电线.png'
+    imageUrl: '/images/58_推理细节_烟灰与电线.png',
+    unlockedAtSceneId: 'knock_door'
   },
   {
     id: 'body_evidence',
@@ -509,7 +513,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '富㭴慎二的尸体显示：被勒死，手腕有被抓住的痕迹——这需要四只手才能做到。',
     dateFound: '2026-04-22',
     type: 'object',
-    imageUrl: '/images/10_铜制花瓶.png'
+    imageUrl: '/images/10_铜制花瓶.png',
+    unlockedAtSceneId: 'offer_help'
   },
   {
     id: 'crime_scene_2',
@@ -517,7 +522,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '尸体被蓝色塑料布覆盖，全裸，脸部被砸烂，手指被烧毁。旁边有一辆失窃的自行车。',
     dateFound: '2026-04-22',
     type: 'photo',
-    imageUrl: '/images/12_案发现场_模糊.png'
+    imageUrl: '/images/12_案发现场_模糊.png',
+    unlockedAtSceneId: 'investigation_start'
   },
   {
     id: 'ishigami_room',
@@ -525,7 +531,8 @@ export const INITIAL_EVIDENCE: Evidence[] = [
     description: '满墙的数学资料，堆积如山的书籍。这是一个数学天才的房间，却住着一个高中老师。',
     dateFound: '2026-04-22',
     type: 'photo',
-    imageUrl: '/images/55_石神的房间内部.png'
+    imageUrl: '/images/55_石神的房间内部.png',
+    unlockedAtSceneId: 'ishigami_interview'
   }
 ];
 
@@ -540,7 +547,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     alibi: '三月十日当晚七点左右回到公寓。声称在家未出门，无目击证人。隔壁动静"记不清了"。',
     relatedCases: [
       { id: 'CASE-001', description: '富㭴慎二被杀案 - 隔壁邻居' }
-    ]
+    ],
+    unlockedAtSceneId: 'start'
   },
   {
     id: 'yasuko',
@@ -552,7 +560,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     alibi: '三月十日晚七点看电影《影武者》，散场后去拉面店，九点四十分起在KTV唱歌一个半小时。KTV店员可作证。电影票根已保存。',
     relatedCases: [
       { id: 'CASE-001', description: '富㭴慎二被杀案 - 死者前妻' }
-    ]
+    ],
+    unlockedAtSceneId: 'bentou_shop'
   },
   {
     id: 'misato',
@@ -562,7 +571,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     imageUrl: '/images/15_KTV场景.png',
     status: 'unknown',
     alibi: '与母亲靖子同行。看电影、拉面店、KTV，行踪一致。',
-    relatedCases: []
+    relatedCases: [],
+    unlockedAtSceneId: 'investigation_progress'
   },
   {
     id: 'togashi',
@@ -574,7 +584,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     alibi: '死者。三月十日前往靖子公寓纠缠，当晚死亡。',
     relatedCases: [
       { id: 'CASE-001', description: '富㭴慎二被杀案 - 死者' }
-    ]
+    ],
+    unlockedAtSceneId: 'identify_body'
   },
   {
     id: 'yukawa',
@@ -584,7 +595,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     imageUrl: '/images/26_汤川学_物理学家.png',
     status: 'innocent',
     alibi: '案发时在帝都大学实验室。以朋友身份协助调查，非案件相关人员。',
-    relatedCases: []
+    relatedCases: [],
+    unlockedAtSceneId: 'yukawa_intro'
   },
   {
     id: 'kusanagi',
@@ -594,7 +606,8 @@ export const INITIAL_SUSPECTS: Suspect[] = [
     imageUrl: '/images/24_草薙的沉思.png',
     status: 'innocent',
     alibi: '搜查一科刑警，本案主办侦探。案发时不在现场附近。',
-    relatedCases: []
+    relatedCases: [],
+    unlockedAtSceneId: 'investigation_start'
   }
 ];
 
@@ -629,12 +642,12 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
 ];
 
 export const CHARACTER_RELATIONS: CharacterRelation[] = [
-  { from: 'ishigami', to: 'yasuko', label: '暗恋 · 愿为她献出一切', type: 'love' },
-  { from: 'yasuko', to: 'togashi', label: '前妻 · 被纠缠', type: 'enemy' },
-  { from: 'yasuko', to: 'misato', label: '母女', type: 'family' },
-  { from: 'ishigami', to: 'yukawa', label: '大学同学 · 天才惺惺相惜', type: 'friend' },
-  { from: 'yukawa', to: 'kusanagi', label: '好友 · 协助破案', type: 'colleague' },
-  { from: 'kusanagi', to: 'yasuko', label: '调查对象', type: 'case' },
-  { from: 'ishigami', to: 'togashi', label: '替她处理尸体', type: 'case' },
-  { from: 'yukawa', to: 'ishigami', label: '识破真相', type: 'case' },
+  { from: 'ishigami', to: 'yasuko', label: '暗恋 · 隔壁邻居', type: 'love', unlockedAtSceneId: 'bentou_shop' },
+  { from: 'yasuko', to: 'togashi', label: '前妻 · 被纠缠', type: 'enemy', unlockedAtSceneId: 'identify_body' },
+  { from: 'yasuko', to: 'misato', label: '母女', type: 'family', unlockedAtSceneId: 'investigation_progress' },
+  { from: 'ishigami', to: 'yukawa', label: '大学同学 · 天才惺惺相惜', type: 'friend', unlockedAtSceneId: 'yukawa_intro' },
+  { from: 'yukawa', to: 'kusanagi', label: '好友 · 协助破案', type: 'colleague', unlockedAtSceneId: 'investigation_start' },
+  { from: 'kusanagi', to: 'yasuko', label: '调查对象', type: 'case', unlockedAtSceneId: 'investigation_start' },
+  { from: 'ishigami', to: 'togashi', label: '替她处理尸体', type: 'case', unlockedAtSceneId: 'ishigami_action' },
+  { from: 'yukawa', to: 'ishigami', label: '识破真相', type: 'case', unlockedAtSceneId: 'yukawa_confront' },
 ];

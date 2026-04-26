@@ -5,6 +5,8 @@ export interface Evidence {
   imageUrl?: string;
   dateFound: string;
   type: 'document' | 'object' | 'photo' | 'testimony';
+  /** 解锁该证据详情所需的场景 ID */
+  unlockedAtSceneId: string;
 }
 
 export interface Suspect {
@@ -16,6 +18,8 @@ export interface Suspect {
   status: 'innocent' | 'suspicious' | 'guilty' | 'unknown';
   relatedCases?: { id: string; description: string }[];
   alibi?: string;
+  /** 解锁该嫌疑人档案所需的场景 ID */
+  unlockedAtSceneId: string;
 }
 
 export interface Choice {
@@ -72,6 +76,8 @@ export interface CharacterRelation {
   to: string;
   label: string;
   type: 'love' | 'family' | 'friend' | 'colleague' | 'enemy' | 'case';
+  /** 解锁该关系所需的场景 ID */
+  unlockedAtSceneId: string;
 }
 
 export interface GameState {

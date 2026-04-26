@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Suspect, CharacterRelation } from '../types';
 
 interface RelationshipMapProps {
   suspects: Suspect[];
   relations: CharacterRelation[];
+  visitedSceneIds: string[];
+  currentSceneId: string;
 }
+
+/**
+ * 检查关系是否已解锁
+ */
+const isRelationUnlocked = (relation: CharacterRelation, visitedSceneIds: string[]): boolean => {
+  const unlockIdx = visitedSceneIds.indexOf(relation.unlockedAtSceneId);
+  return unlockIdx !== -1;
+};
 
 const NODE_POSITIONS: Record<string, { x: number; y: number }> = {
   ishigami: { x: 25, y: 30 },
@@ -25,9 +35,25 @@ const RELATION_COLORS: Record<string, string> = {
   case: '#F59E0B',
 };
 
-export const RelationshipMap: React.FC<RelationshipMapProps> = ({ suspects, relations }) => {
+export const RelationshipMap: React.FC<RelationshipMapProps> = ({ suspects, relations, visitedSceneIds, currentSceneId }) => {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [hoveredRelation, setHoveredRelation] = useState<number | null>(null);
+
+  // 只显示已解锁的关系
+  const unlockedRelations = useMemo(() => 
+    relations.filter(rel => isRelationUnlocked(rel, visitedSceneIds)),
+    [relations, visitedSceneIds]
+  );
+
+  // 只显示与已解锁关系相关的嫌疑人
+  const unlockedRelationIds = useMemo(() => {
+    const ids = new Set<string>();
+    unlockedRelations.forEach(rel => {
+      ids.add(rel.from);
+      ids.add(rel.to);
+    });
+    return ids;
+  }, [unlockedRelations]);
 
   const isRelationHighlighted = (rel: CharacterRelation, idx: number) => {
     if (hoveredRelation === idx) return true;
@@ -61,9 +87,9 @@ export const RelationshipMap: React.FC<RelationshipMapProps> = ({ suspects, rela
           ))}
         </svg>
 
-        {/* Relations (SVG lines) */}
+        {/* Relations (SVG lines) - Only unlocked relations */}
         <svg className="absolute inset-0 w-full h-full z-10">
-          {relations.map((rel, idx) => {
+          {unlockedRelations.map((rel, idx) => {
             const from = NODE_POSITIONS[rel.from];
             const to = NODE_POSITIONS[rel.to];
             if (!from || !to) return null;
@@ -103,8 +129,10 @@ export const RelationshipMap: React.FC<RelationshipMapProps> = ({ suspects, rela
           })}
         </svg>
 
-        {/* Character nodes */}
-        {suspects.map((suspect, idx) => {
+        {/* Character nodes - Only unlocked suspects */}
+        {suspects
+          .filter(suspect => unlockedRelationIds.has(suspect.id))
+          .map((suspect, idx) => {
           const pos = NODE_POSITIONS[suspect.id];
           if (!pos) return null;
 

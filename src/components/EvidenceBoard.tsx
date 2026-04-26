@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Evidence } from '../types';
-import { Box, FileText, Camera, MessageSquare, Maximize2 } from 'lucide-react';
+import { Box, FileText, Camera, MessageSquare, Lock } from 'lucide-react';
 import { EvidenceDetailModal } from './EvidenceDetailModal';
 
 interface EvidenceBoardProps {
   evidence: Evidence[];
+  visitedSceneIds: string[];
+  currentSceneId: string;
 }
+
+/**
+ * 检查证据是否已解锁（玩家是否已访问过解锁场景）
+ */
+const isEvidenceUnlocked = (evidence: Evidence, visitedSceneIds: string[]): boolean => {
+  const unlockIdx = visitedSceneIds.indexOf(evidence.unlockedAtSceneId);
+  return unlockIdx !== -1;
+};
 
 const getIcon = (type: string, className: string = "w-5 h-5") => {
   switch (type) {
@@ -17,19 +27,25 @@ const getIcon = (type: string, className: string = "w-5 h-5") => {
   }
 };
 
-export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ evidence }) => {
+export const EvidenceBoard: React.FC<EvidenceBoardProps> = ({ evidence, visitedSceneIds, currentSceneId }) => {
   const [selectedItem, setSelectedItem] = useState<Evidence | null>(null);
+
+  // 只显示已解锁且已发现的证据
+  const unlockedEvidence = useMemo(() => 
+    evidence.filter(item => isEvidenceUnlocked(item, visitedSceneIds)),
+    [evidence, visitedSceneIds]
+  );
 
   return (
     <div className="p-4 relative">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {evidence.length === 0 ? (
+        {unlockedEvidence.length === 0 ? (
           <div className="col-span-full py-24 flex flex-col items-center justify-center opacity-30 text-center border-2 border-dashed border-white/5 rounded-xl">
             <Box className="w-16 h-16 mb-6" />
             <p className="mono-label text-sm tracking-[0.3em]">No Evidence Recovered</p>
           </div>
         ) : (
-          evidence.map((item, idx) => (
+          unlockedEvidence.map((item, idx) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, scale: 0.95 }}
