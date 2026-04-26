@@ -9,6 +9,13 @@
 
 An interactive detective experience based on Keigo Higashino's masterpiece *The Devotion of Suspect X*. Explore the case, examine evidence, interrogate suspects, and uncover the truth behind the perfect alibi.
 
+### Live Demo
+
+- GitHub Pages: https://ballcard.github.io/suspect-x-explorer/
+- China-friendly mirror: https://pp7p3d2q8r.coze.site
+
+If the in-app browser loads slowly, copy the link and open it in a regular browser.
+
 ![Start Screen](demo-shots/01-start.png)
 
 ### Features
@@ -55,6 +62,13 @@ Open http://localhost:3000 in your browser.
 ## 中文
 
 基于东野圭吾《嫌疑人X的献身》改编的交互式侦探体验。探索案件、收集证据、审问嫌疑人，揭开完美不在场证明背后的真相。
+
+### 在线体验
+
+- GitHub Pages: https://ballcard.github.io/suspect-x-explorer/
+- 国内友好版: https://pp7p3d2q8r.coze.site
+
+> 如果在微信内置浏览器中加载较慢，建议复制链接到系统浏览器打开。
 
 ### 功能特色
 
