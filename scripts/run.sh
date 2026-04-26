@@ -7,4 +7,4 @@ cd "$PROJECT_DIR"
 
 PORT="${DEPLOY_RUN_PORT:-5000}"
 
-exec npx serve dist -l "$PORT"
+exec node_modules/.bin/serve dist -l "$PORT"
