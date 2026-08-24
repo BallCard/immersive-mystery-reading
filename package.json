@@ -1,0 +1,11 @@
+{
+  "name": "immersive-mystery-reading",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "pnpm --dir apps/newcomer-reader run lint && pnpm --dir apps/suspect-x-reader run lint && pnpm --dir apps/suspect-x-explorer run lint",
+    "build": "pnpm --dir apps/newcomer-reader run build && pnpm --dir apps/suspect-x-reader run build && pnpm --dir apps/suspect-x-explorer run build",
+    "validate": "pnpm --dir apps/newcomer-reader run validate",
+    "verify": "pnpm run lint && pnpm run validate && pnpm run build"
+  }
+}
