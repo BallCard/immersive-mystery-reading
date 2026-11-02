@@ -11,6 +11,12 @@ The project transforms Keigo Higashino's fiction into cinematic, role-immersive 
 > GitHub: `https://github.com/BallCard/immersive-mystery-reading`  
 > Next: extract shared reading, clue, progress, and save-state primitives only when a real reuse need appears
 
+## Live demos
+
+- Newcomer Reader: <https://newcomer-reader.vercel.app/>
+- Suspect X Reader: <https://suspect-x-reader.vercel.app/>
+- Suspect X Explorer: <https://suspect-x-explorer.vercel.app/>
+
 ## Experience design
 
 - **Cinematic immersion**: scene illustrations, transitions, ambient sound, and reveal pacing shape the mood and suspense.
@@ -20,11 +26,11 @@ The project transforms Keigo Higashino's fiction into cinematic, role-immersive 
 
 ## Experiences
 
-| App | Source work | Interaction model |
-| --- | --- | --- |
-| `newcomer-reader` | *Newcomer* | atmospheric scenes, neighborhood/Kaga perspectives, and chapter-by-chapter story immersion |
-| `suspect-x-reader` | *The Devotion of Suspect X* | cinematic illustrations, sound cues, alternating Ishigami/police perspectives, and paced story reveal |
-| `suspect-x-explorer` | *The Devotion of Suspect X* | role-immersive detective storytelling with branching scenes, atmospheric effects, and investigation tools |
+| App | Source work | Interaction model | Production |
+| --- | --- | --- | --- |
+| `newcomer-reader` | *Newcomer* | atmospheric scenes, neighborhood/Kaga perspectives, and chapter-by-chapter story immersion | [Open](https://newcomer-reader.vercel.app/) |
+| `suspect-x-reader` | *The Devotion of Suspect X* | cinematic illustrations, sound cues, alternating Ishigami/police perspectives, and paced story reveal | [Open](https://suspect-x-reader.vercel.app/) |
+| `suspect-x-explorer` | *The Devotion of Suspect X* | role-immersive detective storytelling with branching scenes, atmospheric effects, and investigation tools | [Open](https://suspect-x-explorer.vercel.app/) |
 
 The three apps intentionally remain separate. They share a theme and some interaction ideas, but they are not interchangeable versions of one product.
 
@@ -42,6 +48,8 @@ Run the complete verification set from the repository root:
 ```powershell
 pnpm run verify
 ```
+
+Each app is deployed as an independent Vercel project. Its Vite base path defaults to `/`; set `VITE_BASE_PATH` only when a subpath deployment is required.
 
 ## Repository history
 
